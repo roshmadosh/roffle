@@ -24,7 +24,6 @@ def fetch_data():
 
     # discord sets a 50 message limit per request
     while len(json_data) == 50:
-        print('REFETCHING...')
         message_id = json_data[-1]['id']
 
         more_url = url + f'?before={message_id}'
