@@ -1,9 +1,10 @@
+from dataclasses import replace
 import sqlalchemy as db
 from typing import List
 from models.Message import Message
 from dotenv import load_dotenv 
 import os
-
+from emoji_encodings import encodings, replacements
 
 
 # init
@@ -20,9 +21,27 @@ class DAO:
 
         self.conn = engine.connect()
 
-    def execute_query(self, query: str):
-        result = self.conn.execute(query)
-        return list(result)
 
-    # def add_messages(self, messages: List[Message]):
-        
+    def add_messages(self, messages: List[Message]):
+        query = 'INSERT INTO discord (joy, rofl, content) VALUES '
+        query_vals = list(self._get_query_vals(messages))
+        query += ','.join(query_vals)
+
+      
+        print(query)
+        self.conn.execute(query)
+   
+    def _get_query_vals(self, messages: List[Message]):
+        for message in messages:
+            if not message.has_funny_emojis:
+                continue
+            
+            content = message.content
+            if content: 
+                content = content.replace("'", "\\'")
+                content = content.replace('"', '\\"')
+
+            rofl = message.funny_emoji_counts.get(encodings['rofl'], 0)
+            joy = message.funny_emoji_counts.get(encodings['joy'], 0)
+
+            yield f"({joy}, {rofl}, '{content}')"

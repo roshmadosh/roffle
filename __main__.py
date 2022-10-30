@@ -7,4 +7,5 @@ dao = DAO()
 # Get data
 raw_data = get_data()
 messages = [Message(message_obj) for message_obj in raw_data]
-print([(message.content, message.reactions) for message in messages])
+
+dao.add_messages(messages)
