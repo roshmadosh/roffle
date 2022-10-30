@@ -4,16 +4,21 @@ from emoji_encodings import encodings
 class Message:
 
     def __init__(self, message_obj: dict) -> None:
+        # extract relevant values from raw data
         self.content = message_obj.get('content', None)
         reactions = message_obj.get('reactions', [])
 
-        # creating dict property containing counts for rolf and joy emojis
+        # creating dict property containing counts for rofl and joy emojis
         self.funny_emoji_counts = {}
+
+        # assign dict property
         for reaction in reactions:
+
+            # extract relevant values from reaction object
             name = reaction['emoji']['name']
             count = reaction['count']
 
-            # continue loop if irrelevant emoji
+            # continue loop if non-target emoji
             if name not in [encodings['rofl'], encodings['joy']]:
                 continue
 

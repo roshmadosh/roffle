@@ -1,10 +1,9 @@
-from dataclasses import replace
 import sqlalchemy as db
 from typing import List
 from models.Message import Message
 from dotenv import load_dotenv 
 import os
-from emoji_encodings import encodings, replacements
+from emoji_encodings import encodings
 
 
 # init
@@ -14,8 +13,10 @@ password = os.getenv("DB_PASSWORD")
 url = os.getenv("DB_URL")
 schema_name = 'capstone'
 
+
 class DAO:
     def __init__(self):
+        # start db connection
         engine = db.create_engine(
             f"mysql+pymysql://{username}:{password}@{url}/{schema_name}", echo=False)
 
@@ -23,13 +24,14 @@ class DAO:
 
 
     def add_messages(self, messages: List[Message]):
+        # construct query string
         query = 'INSERT INTO discord (joy, rofl, content) VALUES '
         query_vals = list(self._get_query_vals(messages))
         query += ','.join(query_vals)
 
-      
-        print(query)
+        # execute query
         self.conn.execute(query)
+        print('\n***Messages successfully added to DB****\n')
    
     def _get_query_vals(self, messages: List[Message]):
         for message in messages:
@@ -37,10 +39,12 @@ class DAO:
                 continue
             
             content = message.content
+            # escape single and double quotes 
             if content: 
                 content = content.replace("'", "\\'")
                 content = content.replace('"', '\\"')
 
+            # get message's joy and rofl counts
             rofl = message.funny_emoji_counts.get(encodings['rofl'], 0)
             joy = message.funny_emoji_counts.get(encodings['joy'], 0)
 
