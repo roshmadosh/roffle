@@ -15,9 +15,24 @@ urls =[
 ]
 auth = os.getenv("AUTH")
 cookie = os.getenv("COOKIE")
-output_file = os.getenv("OUTPUT_FILE")
+output_file = "bds_data.txt"
+output_file_list = "bds_data_list.txt"
 
-def fetch_data():
+def get_data():
+    # fetch from Discord server only if txt file not found
+    if not os.path.exists(output_file) or not os.path.exists(output_file_list):
+        print('fetching data....')
+        discord_fetch()
+
+    # return contents of file.
+    with open(output_file) as f:
+        messages = []
+        for message in f:
+            messages.append(json.loads(message))
+
+        return messages
+
+def discord_fetch():
     """
     Generates a txt file after fetching messages from Discord server. For preventing unnecessary API calls.
     """        
@@ -46,26 +61,11 @@ def fetch_data():
             messages.extend(json_data)
 
         # write to text file
-        with open(output_file, 'a') as f:
+        with open(output_file, 'w') as f:
             for message in messages:
                 f.write(json.dumps(message))
                 f.write("\n")
-
-def get_data():
-    # fetch from Discord server only if txt file not found
-    if not os.path.exists(output_file):
-        print('fetching data....')
-        fetch_data()
-
-    # return contents of file.
-    with open(output_file) as f:
-        messages = []
-        for message in f:
-            messages.append(json.loads(message))
-
-
-        return messages
-
-
+        with open(output_file_list, 'w') as f:
+            f.write(json.dumps(messages))
 
     
