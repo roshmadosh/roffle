@@ -9,8 +9,15 @@ class Message:
         reactions = message_obj.get('reactions', [])
 
         # creating dict property containing counts for rofl and joy emojis
-        self.funny_emoji_counts = {}
+        self.funny_emoji_counts = self._generate_funny_emoji_counts(reactions)
+    
+            
+        # convenience property for filtering funny messages
+        self.has_funny_emojis = len(self.funny_emoji_counts.keys()) > 0
 
+
+    def _generate_funny_emoji_counts(self, reactions) -> dict:
+        funny_emoji_counts = {}
         # assign dict property
         for reaction in reactions:
 
@@ -23,9 +30,6 @@ class Message:
                 continue
 
             # assigns key and count property
-            self.funny_emoji_counts[name] = count
-            
-        # convenience property for filtering funny messages
-        self.has_funny_emojis = len(self.funny_emoji_counts.keys()) > 0
-
+            funny_emoji_counts[name] = count
+        return funny_emoji_counts
   

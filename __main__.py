@@ -4,10 +4,9 @@ from models.Message import Message
 
 dao = DAO()
 
-# Get data
+# Get data without filtering funny messages
 raw_data = get_data()
 
-# convert to list of Message objects
 messages = [Message(message_obj) for message_obj in raw_data]
 
 # make db call

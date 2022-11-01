@@ -31,10 +31,12 @@ class DAO:
 
         # execute query
         self.conn.execute(query)
-        print('\n***Messages successfully added to DB****\n')
+        print(f'\n***Messages successfully added {len(query_vals)} to DB****\n')
    
     def _get_query_vals(self, messages: List[Message]):
         for message in messages:
+
+            # filter funny messages
             if not message.has_funny_emojis:
                 continue
             
