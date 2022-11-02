@@ -7,6 +7,7 @@ dao = DAO()
 # Get data without filtering funny messages
 raw_data = get_data()
 
+# convert each item in raw data to a Message object
 messages = [Message(message_obj) for message_obj in raw_data]
 
 # make db call

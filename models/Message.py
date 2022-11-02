@@ -5,6 +5,7 @@ class Message:
 
     def __init__(self, message_obj: dict) -> None:
         # extract relevant values from raw data
+        self.discord_id = message_obj.get('id')
         self.content = message_obj.get('content', None)
         reactions = message_obj.get('reactions', [])
 
