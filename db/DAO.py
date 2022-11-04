@@ -4,6 +4,7 @@ from models.Message import Message
 from dotenv import load_dotenv 
 import os
 from emoji_encodings import encodings
+from utils import console_logger, ColorStatus
 
 
 # init
@@ -26,7 +27,6 @@ class DAO:
         query = 'SELECT * FROM discord;'
         return list(self.conn.execute(query))
 
-    #TODO Filter out messages that have already been saved
     def add_messages(self, messages: List[Message]):
         # construct query string
         query = 'INSERT INTO discord (discord_id, joy, rofl, content) VALUES '
@@ -34,15 +34,20 @@ class DAO:
 
         # if no new data being added, exit function
         if not query_vals:
-            print("No new data to add.")
+            console_logger("No new data to add.", status=ColorStatus.ERROR)
             return 
 
         # append query values
         query += ','.join(query_vals)
 
         # execute query
-        self.conn.execute(query)
-        print(f'\n***Messages successfully added {len(query_vals)} to DB****\n')
+        try:
+            self.conn.execute(query)
+        except Exception as err:
+            console_logger(f'{err}', status=ColorStatus.ERROR)
+            return
+
+        console_logger(f'\n***Messages successfully added {len(query_vals)} to DB****\n')
 
 
     def _is_saved_already(self, message: Message) -> bool:
@@ -64,10 +69,11 @@ class DAO:
                 continue
 
             content = message.content
-            # escape single and double quotes 
+            # escape error-causing characters
             if content: 
                 content = content.replace("'", "\\'")
                 content = content.replace('"', '\\"')
+                content = content.replace('%', '%%')
 
             # get message's joy and rofl counts
             discord_id = message.discord_id

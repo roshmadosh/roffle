@@ -1,6 +1,7 @@
 from pyscripts.fetch import get_data
 from db.DAO import DAO
 from models.Message import Message
+from pyscripts.image_process import save_images_s3
 
 dao = DAO()
 
@@ -12,3 +13,6 @@ messages = [Message(message_obj) for message_obj in raw_data]
 
 # make db call
 dao.add_messages(messages)
+
+# save images to S3
+save_images_s3()
