@@ -15,4 +15,4 @@ messages = [Message(message_obj) for message_obj in raw_data]
 dao.add_messages(messages)
 
 # save images to S3
-save_images_s3()
+# save_images_s3()

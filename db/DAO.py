@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 from emoji_encodings import encodings
 from utils import console_logger, ColorStatus
+import traceback
 
 
 # init
@@ -29,7 +30,7 @@ class DAO:
 
     def add_messages(self, messages: List[Message]):
         # construct query string
-        query = 'INSERT INTO discord (discord_id, joy, rofl, content) VALUES '
+        query = 'INSERT INTO discord (discord_id, joy, rofl, has_funny_emoji, content) VALUES '
         query_vals = list(self._get_query_vals(messages))
 
         # if no new data being added, exit function
@@ -41,10 +42,12 @@ class DAO:
         query += ','.join(query_vals)
 
         # execute query
+        # try:
         try:
+            console_logger('Executing MySQL query...')
             self.conn.execute(query)
         except Exception as err:
-            console_logger(f'{err}', status=ColorStatus.ERROR)
+            console_logger(err, status=ColorStatus.ERROR)
             return
 
         console_logger(f'\n***Messages successfully added {len(query_vals)} to DB****\n')
@@ -59,28 +62,33 @@ class DAO:
             return message.discord_id in saved_ids
 
     def _get_query_vals(self, messages: List[Message]):
-        for message in messages:
-            # filter out messages without laughing emojis
-            if not message.has_funny_emojis:
+        console_logger('Generating query values...')
+        for iter, message in enumerate(messages):
+            if message.discord_id == '897564089650405416':
                 continue
+            # filter out messages without laughing emojis
+            # if not message.has_funny_emojis:
+            #     continue
             
             # filter messages already saved to DB
-            if self._is_saved_already(message):
-                continue
+            # if self._is_saved_already(message):
+            #     continue
 
             content = message.content
             # escape error-causing characters
             if content: 
+                content = content.replace('\\', '')
                 content = content.replace("'", "\\'")
                 content = content.replace('"', '\\"')
                 content = content.replace('%', '%%')
-
+     
             # get message's joy and rofl counts
             discord_id = message.discord_id
             rofl = message.funny_emoji_counts.get(encodings['rofl'], 0)
             joy = message.funny_emoji_counts.get(encodings['joy'], 0)
+            has_funny_emoji = message.has_funny_emojis
 
-            yield f"({discord_id}, {joy}, {rofl}, '{content}')"
+            yield f"({discord_id}, {joy}, {rofl}, {int(has_funny_emoji)}, '{content}')"
         
 
 

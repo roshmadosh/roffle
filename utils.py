@@ -23,9 +23,15 @@ def console_logger(message: str, status = ColorStatus.INFO) -> None:
 
     if status is ColorStatus.ERROR:
         color = bcolors.FAIL
+        # log to error file
+        with open('error_log.txt', 'a') as f:
+            f.write(f"{color}{datetime.datetime.now()}: {message}{bcolors.ENDC}")
+            f.write('\n')
+
     elif status is ColorStatus.SUCCESS:
         color = bcolors.OKGREEN
     else:
         color = bcolors.WARNING
-    
-    print(f"{color}{datetime.datetime.now()}: {message}{bcolors.ENDC}")
+
+    print(f"{color}{datetime.datetime.now()}: {message}{bcolors.ENDC}"
+)

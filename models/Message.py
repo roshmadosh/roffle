@@ -26,11 +26,12 @@ class Message:
             name = reaction['emoji']['name']
             count = reaction['count']
 
-            # continue loop if non-target emoji
-            if name not in [encodings['rofl'], encodings['joy']]:
-                continue
+            # funny_emoji_count object will be empty if reacction has no funny emojis
+            # if name not in [encodings['rofl'], encodings['joy']]:
+            #     continue
 
-            # assigns key and count property
-            funny_emoji_counts[name] = count
+            # add relevant emojis to funny emoji count object
+            if name in [encodings['rofl'], encodings['joy']]:
+                funny_emoji_counts[name] = count
+                
         return funny_emoji_counts
-  
