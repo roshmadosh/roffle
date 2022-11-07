@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 import os
 from emoji_encodings import encodings
 from utils import console_logger, ColorStatus
-import traceback
-
 
 # init
 load_dotenv()
@@ -16,7 +14,7 @@ url = os.getenv("DB_URL")
 schema_name = 'capstone'
 
 
-class DAO:
+class DataAccessObject:
     def __init__(self):
         # start db connection
         engine = db.create_engine(
@@ -26,6 +24,10 @@ class DAO:
     
     def get_messages(self):
         query = 'SELECT * FROM discord;'
+        return list(self.conn.execute(query))
+        
+    def get_column_names(self):
+        query = 'SHOW COLUMNS FROM discord;'
         return list(self.conn.execute(query))
 
     def add_messages(self, messages: List[Message]):
@@ -66,13 +68,6 @@ class DAO:
         for iter, message in enumerate(messages):
             if message.discord_id == '897564089650405416':
                 continue
-            # filter out messages without laughing emojis
-            # if not message.has_funny_emojis:
-            #     continue
-            
-            # filter messages already saved to DB
-            # if self._is_saved_already(message):
-            #     continue
 
             content = message.content
             # escape error-causing characters

@@ -1,9 +1,9 @@
 from pyscripts.fetch import get_data
-from db.DAO import DAO
+from db.DataAccessObject import DataAccessObject
 from models.Message import Message
 from pyscripts.image_process import save_images_s3
 
-dao = DAO()
+dao = DataAccessObject()
 
 # Get data without filtering funny messages
 raw_data = get_data()
