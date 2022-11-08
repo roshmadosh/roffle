@@ -5,7 +5,7 @@ from io import BytesIO
 import os
 from dotenv import load_dotenv
 import boto3
-from utils import console_logger, ColorStatus
+from utils.color_console import console_logger, ColorStatus
 
 load_dotenv()
 

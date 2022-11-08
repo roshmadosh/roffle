@@ -3,8 +3,8 @@ from typing import List
 from models.Message import Message
 from dotenv import load_dotenv 
 import os
-from emoji_encodings import encodings
-from utils import console_logger, ColorStatus
+from utils.emoji_encodings import encodings
+from utils.color_console import console_logger, ColorStatus
 
 # init
 load_dotenv()
@@ -24,11 +24,24 @@ class DataAccessObject:
     
     def get_messages(self):
         query = 'SELECT * FROM discord;'
-        return list(self.conn.execute(query))
+        messages = list(self.conn.execute(query))
+
+        # content needs to be decoded from ASCII to Unicode
+        content = [str(message[-1].decode("UTF-8")) for message in messages]
+        other_features = [list(message[:-1]) for message in messages]
         
+        # construct new messages
+        new_messages = list()
+        for ind in range(len(content)):
+            other_features[ind].append(content[ind])
+            new_messages.append(other_features[ind])
+    
+        return new_messages
+            
     def get_column_names(self):
         query = 'SHOW COLUMNS FROM discord;'
-        return list(self.conn.execute(query))
+        columns = list(self.conn.execute(query))
+        return [column[0] for column in columns]
 
     def add_messages(self, messages: List[Message]):
         # construct query string

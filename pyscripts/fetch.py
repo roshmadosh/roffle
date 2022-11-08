@@ -2,7 +2,7 @@ import requests
 import os
 import json
 from dotenv import load_dotenv 
-from utils import console_logger
+from utils.color_console import console_logger, ColorStatus
 
 
 load_dotenv()   
@@ -18,6 +18,8 @@ urls =[
 
 auth = os.getenv("AUTH")
 cookie = os.getenv("COOKIE")
+
+# bds_data.txt for general reading, bds_data_list.txt for image processing
 output_file = "bds_data.txt"
 output_file_list = "bds_data_list.txt"
 
@@ -25,8 +27,11 @@ def get_data():
     # fetch from Discord server only if txt file not found
     if not os.path.exists(output_file) or not os.path.exists(output_file_list):
         console_logger('fetching data....')
-        discord_fetch()
-
+        messages = _discord_fetch()
+        console_logger('generating txt files...')
+        _generate_txt(messages)
+        
+        console_logger('completed fetch and txt generation!', status=ColorStatus.SUCCESS)
     # return contents of file.
     with open(output_file) as f:
         messages = []
@@ -35,7 +40,7 @@ def get_data():
 
         return messages
 
-def discord_fetch():
+def _discord_fetch():
     """
     Generates a txt file after fetching messages from Discord server. For preventing unnecessary API calls.
     """        
@@ -66,14 +71,16 @@ def discord_fetch():
             json_data = more_data.json()
             messages.extend(json_data)
             i += 1
-        # write to text file
-        with open(output_file, 'w') as f:
-            console_logger(f'Writing {url} to {output_file}')
-            for message in messages:
-                f.write(json.dumps(message))
-                f.write("\n")
-        with open(output_file_list, 'w') as f:
-            console_logger(f'Writing {url} to {output_file}')
-            f.write(json.dumps(messages))
+    return messages
 
+def _generate_txt(messages):
+    # write to text file
+    with open(output_file, 'w') as f:
+        console_logger(f'Writing to {output_file}')
+        for message in messages:
+            f.write(json.dumps(message))
+            f.write("\n")
+    with open(output_file_list, 'w') as f:
+        console_logger(f'Writing to {output_file}')
+        f.write(json.dumps(messages))
     

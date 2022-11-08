@@ -1,5 +1,5 @@
 from importlib.resources import contents
-from emoji_encodings import encodings
+from utils.emoji_encodings import encodings
 
 class Message:
 
