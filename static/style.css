@@ -28,10 +28,9 @@ main {
 .section {
     height: auto;
     min-height: 20rem;  
-    padding: var(--padding);
 }
 
-.text-editor {
+#text-editor {
     background: rgba(0,0,0, 0.5);
     color: var(--color-white);
     font-size: 1.6rem;
@@ -39,15 +38,21 @@ main {
 }
 
 [contenteditable] {
+    position: relative;
     outline: 0px solid transparent;
+    margin-left: 5%;
+    margin-top: 5%;
+    min-width: 80%;
+    display: inline-block;
+    overflow-x: hidden;
 }
 
 #placeholder {
     color: #ddd;
     pointer-events: none;
     position: absolute;
-    top: var(--padding);
-    left:var(--padding);    
+    top: 5%;
+    left: 5%;    
 }
 
 .invisible {
