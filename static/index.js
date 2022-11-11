@@ -1,24 +1,31 @@
 const textEditor = document.getElementById("text-editor");
-let contentEditable = document.getElementById("line1");
+let line1 = document.getElementById("line1");
 const placeholder = document.getElementById("placeholder");
 
 
 let line_number = 1;
 
-contentEditable.addEventListener("focusin", contentEditableEventHandler);
-contentEditable.addEventListener("focusout", contentEditableEventHandler);
-contentEditable.addEventListener("keydown", keydownEventHandler);
+
+line1.addEventListener("focusin", contentEditableEventHandler);
+line1.addEventListener("focusout", contentEditableEventHandler);
+line1.addEventListener("keydown", keydownEventHandler);
 
 
 function contentEditableEventHandler(e) {
-    const event = e.type
+    const event = e.type;
+    const lines = document.querySelectorAll('[contenteditable]');
+
+    if (lines.length > 1) {
+        return;
+    }
+    
     switch (event) {
         case 'focusin':       
-            if (!contentEditable.textContent) {
+            if (!line1.textContent) {
                 placeholder.classList.add('invisible')
             } break;
         case 'focusout':
-            if (!contentEditable.textContent) {
+            if (!line1.textContent) {
                 placeholder.classList.remove('invisible')
             } break;
 
@@ -28,30 +35,58 @@ function contentEditableEventHandler(e) {
 }
 
 function keydownEventHandler(e) {
-    const textEditor = document.getElementById('text-editor');
+    
+    const contentEditable = e.originalTarget;  
     const max_width = textEditor.offsetWidth * .87;
-    if (contentEditable.offsetWidth > max_width) { 
-        e.preventDefault();
-        createNewLine(); 
-    }
 
     const key = e.key;
+
     switch (key) {
         case 'Enter':
             createNewLine();
-            break;
-
+            return;
+        case 'Backspace':
+            if (!contentEditable.innerText) {
+                removeLine()
+            } return;
         default:
             break;
     }
+
+    if (contentEditable.offsetWidth > max_width) { 
+        e.preventDefault();
+        createNewLine(); 
+        return;
+    }
+
 
 }
 
 
 function createNewLine() {
     line_number++;
-    textEditor.innerHTML += `<br><span contentEditable="true" id="line${line_number}"></span>`
-    contentEditable = document.getElementById(`line${line_number}`);
-    contentEditable.addEventListener("keydown", keydownEventHandler);
-    contentEditable.focus()
+    const breakline = document.createElement('br');
+    breakline.setAttribute('id', `breakline${line_number}`);
+    const newline = document.createElement('span');
+    newline.setAttribute('id', `line${line_number}`);
+    newline.setAttribute('contenteditable', 'true');
+
+    textEditor.appendChild(breakline);
+    textEditor.appendChild(newline)
+    
+    newline.addEventListener("keydown", keydownEventHandler);
+    newline.focus();
+}
+
+function removeLine() {
+
+    const breakline = document.getElementById(`breakline${line_number}`);
+    const prevLine = document.getElementById(`line${line_number - 1}`)
+    const line = document.getElementById(`line${line_number}`);
+    breakline.remove()
+    line.remove();
+
+
+    prevLine.focus();
+
 }
