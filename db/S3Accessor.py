@@ -1,10 +1,9 @@
-from PIL import Image
 import requests
-from io import BytesIO
 import boto3
 from utils.color_console import console_logger, ColorStatus
 from typing import List
 from db import FileIO
+from models import S3_Image
 
 class S3Accessor:
     def __init__(self, bucket_name: str) -> None:
@@ -13,23 +12,36 @@ class S3Accessor:
         # bucket "cursor"
         self.bucket = s3.Bucket(bucket_name)
     
-    def read_images(self) -> List:
+    def read_images(self) -> List[S3_Image]:
         images = []
         for obj in self.bucket.objects.all():
             console_logger(f'Reading {obj.key} from S3...')
-            key = obj.key
-            body = obj.get()['Body'].read()
-            image_obj =  { "id": key, "PIL_Image": body}
-
-            # Code for showing images from byte data saved in S3
-            # img = Image.open(BytesIO(body))
-            # img.show()
-            images.append(image_obj)
+            img = S3_Image(key=obj.key, body=obj.get()['Body'].read())
+            images.append(img)
     
         console_logger('Successfully read all images from S3!', status=ColorStatus.SUCCESS)
         return images
 
-    def save_images_s3(self):
+    def read_image_by_key(self, discord_id:str) -> S3_Image:
+        images = self.bucket.objects.all()
+
+        # converting to S3_Image objects in for-loop bc I can't get image body otherwise
+        # for obj in images:
+        #     console_logger(obj.get())
+        #     console_logger(f'Converting {obj.key} to S3_Image object...')
+        #     s3_images.append(S3_Image(obj.key, obj.get()['Body'].read()))
+
+        filter_result = [s3_image for s3_image in images if s3_image.key == discord_id]
+        
+        if not filter_result :
+            raise FileNotFoundError(f'{discord_id} not found in S3 bucket.')
+
+        s3_image = S3_Image(filter_result[0].key, filter_result[0].get()['Body'].read())
+        
+        return s3_image
+
+
+    def save_images(self):
         # filter out objects already saved to s3
         filereader = FileIO('bds_data')
         

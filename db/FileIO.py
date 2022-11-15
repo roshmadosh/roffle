@@ -3,6 +3,7 @@ import json
 import os
 from dotenv import load_dotenv
 from utils.color_console import console_logger, ColorStatus
+from models import Message
 
 load_dotenv()
 
@@ -32,7 +33,7 @@ class FileIO:
 
         return img_urls
     
-    def read_files(self):
+    def read_filename(self) -> List[Message]:
         # fetch from Discord server only if txt file not found
         if not os.path.exists(self.filename) or not os.path.exists(self.filename_list):
             raise FileNotFoundError()
@@ -44,7 +45,15 @@ class FileIO:
             for message in f:
                 messages.append(json.loads(message))
 
-        return messages
+        return [Message(message) for message in messages]
+    
+    def read_filename_by_id(self, discord_id: str) -> Message:
+        messages = self.read_filename()
+        filter_result = [message for message in messages if message.discord_id == discord_id]
+        if filter_result:
+            return filter_result
+        else:
+            raise ValueError(f'{discord_id} not found in {self.filename}')
 
     def write_files(self, messages):
         if os.path.exists(self.filename):

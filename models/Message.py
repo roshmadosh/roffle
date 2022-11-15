@@ -1,4 +1,3 @@
-from importlib.resources import contents
 from utils.emoji_encodings import encodings
 
 class Message:
