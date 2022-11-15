@@ -37,6 +37,14 @@ class DataAccessObject:
             new_messages.append(other_features[ind])
     
         return new_messages
+    
+    def get_message_by_id(self, id):
+        query = f'SELECT * FROM discord WHERE discord_id = {id}'
+        message = list(self.conn.execute(query))
+        if message:
+            return message
+        else:
+            raise ValueError('Could not find message with matching discord ID.')
             
     def get_column_names(self):
         query = 'SHOW COLUMNS FROM discord;'
