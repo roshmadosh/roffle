@@ -4,6 +4,9 @@ from utils.color_console import console_logger, ColorStatus
 from typing import List
 from db import FileIO
 from models import S3_Image
+from io import BytesIO
+import json
+
 
 class S3Accessor:
     def __init__(self, bucket_name: str) -> None:
@@ -67,3 +70,6 @@ class S3Accessor:
             
         console_logger(f"Images saved to S3. Total of {len(filtered_content)} saved", ColorStatus.SUCCESS)
 
+    def save_json(self, filename):
+        with open(filename, 'rb') as file:
+            self.bucket.put_object(Key=filename, Body=file)

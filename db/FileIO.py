@@ -11,7 +11,7 @@ load_dotenv()
 class FileIO:
     def __init__(self, filename: str):
         root = os.getenv("ROOT")
-        self.filename = f'{root}/{filename}.txt'
+        self.filename = f'{root}/{filename}.json'
         self.filename_list = f'{root}/{filename}_list.txt'
 
     def get_img_urls(self) -> List:
