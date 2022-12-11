@@ -1,4 +1,5 @@
 from utils.emoji_encodings import encodings
+from datetime import datetime
 
 class Message:
 
@@ -7,6 +8,7 @@ class Message:
         self.discord_id = message_obj.get('id')
         self.content = message_obj.get('content', None)
         reactions = message_obj.get('reactions', [])
+        timestamp = message_obj.get('timestamp', None)
 
         # creating dict property containing counts for rofl and joy emojis
         self.funny_emoji_counts = self._generate_funny_emoji_counts(reactions)
@@ -15,6 +17,8 @@ class Message:
         # convenience property for filtering funny messages
         self.has_funny_emojis = len(self.funny_emoji_counts.keys()) > 0
 
+        # for time-series analysis of when funny emojis were posted
+        self.timestamp = datetime.fromtimestamp(timestamp)
 
     def _generate_funny_emoji_counts(self, reactions) -> dict:
         funny_emoji_counts = {}
