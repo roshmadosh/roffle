@@ -15,25 +15,33 @@ It's probably not wrong to say humor is subjective, so instead of trying to crea
 
 ## Process  
 
-To obtain my data I made use of an idea I inspired by [a Medium article](https://hongchai.medium.com/scraping-discord-channels-d5de7ee87abe), where you visit the Discord channel like you normally would on your browser, and use the browser's developer tools to figure out where and how the browser makes a request to obtain the messages it renders to the user.  
+The means of obtaining my data was inspired by [a Medium article](https://hongchai.medium.com/scraping-discord-channels-d5de7ee87abe), where you visit the Discord channel like you normally would on your browser, and use the browser's developer tools to figure out where and how the browser makes a request to obtain the messages it renders to the user.  
+
 
 ![scraping discord messages](roffle-scrape.png "The data is all there!")  
 
-I tried several methods to prepare the data for analysis and modeling. Originally I tried doing things programmatically in Python (e.g. creating Python classes to map JSON to the dataframe I want), but found a more streamlined way of data processing through [AWS Glue](https://aws.amazon.com/glue/) and [AWS Athena](https://aws.amazon.com/athena/). Glue would take my scarped JSON data in an AWS S3 bucket and convert it to relational table, then with Athena I could make SQL queries and get the outputs of those queries as a CSV.  
+
+I tried several methods to prepare the data for analysis and modeling. Originally I tried doing things programmatically in Python (e.g. creating Python classes to map JSON to the dataframe I want), but found a more streamlined way of data processing through [AWS Glue](https://aws.amazon.com/glue/) and [AWS Athena](https://aws.amazon.com/athena/). Glue takes my scraped JSON data in an AWS S3 bucket and converts it to a relational table. Athena allows me to make SQL queries on this table and generate the outputs of those queries as a CSV.  
+
 
 ![flowchart](roffle-flowchart.png)  
 
-This allowed for me to use a simple Logistic Regression on the tokenized content, and while the final model failed to identify many of the funny messages, the ones it did identify were more likely to have had funny emoji reactions than not (this is on a data set that was split roughly evenly between "funny" and "not funny").  
 
-While this model would not perform particularly well in identifying repeated attempts to post a funny message, it could serve as a Discord bot that, because of it's relatively high precision will react to messages that are actually meant to be funny.  
+I use a simple Logistic Regression after tokenizing all the messages, and while the final model fails to identify many of the funny messages, the ones it does identify are more likely to have had funny emoji reactions than not (this is on a data set that is split roughly evenly between "funny" and "not funny").  
+
+While this model would not perform particularly well in identifying repeated attempts to post a funny message, it could serve as a Discord bot that, because of it's relatively high precision, will react to messages that are actually meant to be funny.  
 
 Another consideration that would supplement such a feature (the Discord bot) is determining if the chances of a funny message being posted increases significantly if a funny posting was made within a given timeframe. This is based on the assumption that a funny comment can lead to a "streak" of funny content being posted in response.  
 
-To explore this, I divided the data into six annual quarters and plotted compared the days elapsed until the next funny comment was posted over time.  
+To explore this, I divide the data into six annual quarters and for each day, compare the number of days until the next funny posting was made. The results are show below, where the horizontal axis represents the number of days since last funny posting, and the vertical axis are the days in chronological order.
+
 
 ![time series](roffle-time-series.png)  
 
-The width of the bar and its variation across time suggest that funny comments do in fact happen in "spurts." For a Discord bot, this would mean increasing the likelihood of the bot reacting to a message if one has already been posted.  
 
-For the next sprint I want to focus on developing a more autonomous pipeline, from data ingestion to the final model. I would also try to apply the model in some way, whether it be a bot or otherwise.
 
+The variation of the widths of the bars across time suggest that funny comments do in fact happen in "clusters" rather than regular intervals or with any consistency. For a Discord bot, this would mean increasing the likelihood of the bot reacting to the messages following a funny posting.  
+
+## Final Remarks  
+
+Since new Discord messages are posted almost every day, for my next sprint I would like to set up a system where this new data is fed to a pipeline that automatically updates my model. I would also want to make progress applying my model, whether it be Discord bot or otherwise.
