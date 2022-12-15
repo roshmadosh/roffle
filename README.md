@@ -1,6 +1,7 @@
 # :roffle:
 ---
 A linear model that predicts the likelihood of a message on my Discord channels getting a 😂 or 🤣 reaction.  
+Tech: Python, Scikit-learn, AWS
 
 The model was trained on data from July of 2021 until now, and spans over 24 thousand messages.  
 
@@ -13,3 +14,4 @@ Repo contents (directories are denoted with a `/` at the end):
 - `pyscripts/` and `utils/` both contain ad-hoc functions, notable the Discord fetcher in `pyscripts/`
 - `bds_data` files are there to prevent having to repeatedly ping AWS resources.
 - `static/` is for a UI that may eventually be created for interacting with the model.
+
